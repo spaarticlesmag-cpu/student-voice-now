@@ -44,8 +44,13 @@ export const signPetition = createServerFn({ method: "POST" })
       throw new Error("We couldn't record your signature. Please try again.");
     }
 
-    // TODO: Once an email sender domain is configured, notify PMO, SC and Education Minister here.
-    // Recipients: appt.pmo@nic.in, supremecourt@nic.in, d.pradhan@sansad.nic.in
+    // Send notification emails via Gmail connector (from petitionforpeace26@gmail.com)
+    try {
+      await sendPetitionEmails(data.name, data.email);
+    } catch (e) {
+      console.error("[signPetition] email dispatch failed:", e);
+      // Do not fail the signature if email dispatch fails
+    }
 
     const { count } = await supabase
       .from("petition_signatures")
